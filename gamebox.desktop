@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=Game;
+Encoding=UTF-8
+Exec=/usr/bin/gamebox
+GenericName=Game
+Icon=applications-games
+Comment=Gamebox is a collection of minigames written in C using Gtk+-3.0
+Name=Gamebox
+Terminal=false
+Type=Application
