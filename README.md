@@ -41,4 +41,5 @@ Gamebox is a collection of minigames written in C using Gtk+\-3.0
 # Author
 Find me on:
 JannikHv@gmail.com
+
 https://twitter.com/TheJannikHa
