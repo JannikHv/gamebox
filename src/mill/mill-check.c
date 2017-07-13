@@ -25,9 +25,10 @@ static gboolean mill_check_get_is_mill(MillField *group[3])
 gint mill_check_get_free_fields(MillField *field[7][7],
                                 MillOwner  owner)
 {
-        gint i, k, cnt;
-        gint free = 0;
+        gint i, k, cnt, free;
         MillOwner tmp;
+
+        free = 0;
 
         for (i=0; i<7; i++) {
                 for (k=0; k<7; k++) {

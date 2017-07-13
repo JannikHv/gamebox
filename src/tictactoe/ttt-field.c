@@ -52,7 +52,9 @@ void ttt_field_set_owner(TttField *field,
 {
         field->owner = owner;
 
-        GtkLabel *label = GTK_LABEL(field->label);
+        GtkLabel *label;
+
+        label = GTK_LABEL(field->label);
 
         switch (owner) {
         case TTT_OWNER_NONE:
@@ -70,7 +72,9 @@ void ttt_field_set_owner(TttField *field,
 void ttt_field_set_preowner(TttField *field,
                             TttOwner owner)
 {
-        GtkLabel *label = GTK_LABEL(field->label);
+        GtkLabel *label;
+
+        label = GTK_LABEL(field->label);
 
         switch (owner) {
         case TTT_OWNER_NONE:

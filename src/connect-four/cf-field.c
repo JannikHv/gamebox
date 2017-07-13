@@ -50,7 +50,9 @@ void cf_field_set_owner(CfField *field,
 {
         field->owner = owner;
 
-        GtkStyleContext *context = gtk_widget_get_style_context(field->button);
+        GtkStyleContext *context;
+
+        context = gtk_widget_get_style_context(field->button);
 
         switch (owner) {
         case CF_OWNER_NONE:

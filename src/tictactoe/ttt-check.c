@@ -20,6 +20,7 @@ gboolean ttt_check_get_won(TttField *field[3][3])
         gint i, k;
         TttOwner group[3];
 
+        /* Check vertically and horizontally */
         for (i = 0; i < 3; i++) {
                 for (k = 0; k < 3; k++)
                         group[k] = ttt_field_get_owner(field[i][k]);
@@ -34,6 +35,7 @@ gboolean ttt_check_get_won(TttField *field[3][3])
                         return TRUE;
         }
 
+        /* Check diagonally */
         group[1] = ttt_field_get_owner(field[1][1]);
 
         group[0] = ttt_field_get_owner(field[0][0]);

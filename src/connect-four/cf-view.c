@@ -43,12 +43,10 @@ static void cf_field_enter(GtkWidget *button,
                            CfField *field)
 {
         CfView *view;
-        gint round;
         CfOwner owner;
 
         view  = cf_field_get_view(field);
-        round = view->round;
-        owner = (round % 2 == 0) ? CF_OWNER_ONE : CF_OWNER_TWO;
+        owner = (view->round % 2 == 0) ? CF_OWNER_ONE : CF_OWNER_TWO;
 
         if (!view->running) return;
 
@@ -59,18 +57,16 @@ static void cf_field_clicked(GtkWidget *button,
                              CfField *field)
 {
         CfView *view;
-        gint round;
         CfField *lowest;
         GtkHeaderBar *hbar;
         CfOwner owner, enemy, owner_now;
 
         view      = cf_field_get_view(field);
-        round     = view->round;
         lowest    = cf_check_get_lowest_field(view->field, field);
         hbar      = GTK_HEADER_BAR(view->hbar);
         owner     = cf_field_get_owner(field);
-        enemy     = (round % 2 == 0) ? CF_OWNER_TWO : CF_OWNER_ONE;
-        owner_now = (round % 2 == 0) ? CF_OWNER_ONE : CF_OWNER_TWO;
+        enemy     = (view->round % 2 == 0) ? CF_OWNER_TWO : CF_OWNER_ONE;
+        owner_now = (view->round % 2 == 0) ? CF_OWNER_ONE : CF_OWNER_TWO;
 
         /* Check if game is running */
         if (!view->running) return;
@@ -89,7 +85,7 @@ static void cf_field_clicked(GtkWidget *button,
 
         /* Check if someone has won */
         if (cf_check_get_won(view->field)) {
-                if (round % 2 == 0)
+                if (view->round % 2 == 0)
                         gtk_header_bar_set_title(hbar, CF_TITLE_WON_ONE);
                 else
                         gtk_header_bar_set_title(hbar, CF_TITLE_WON_TWO);
@@ -101,14 +97,14 @@ static void cf_field_clicked(GtkWidget *button,
         }
 
         /* Check for a draw */
-        if (round == 41) {
+        if (view->round == 41) {
                 gtk_header_bar_set_title(hbar, CF_TITLE_DRAW);
                 view->running = FALSE;
                 return;
         }
 
         /* Switch owner */
-        if (round % 2 == 0)
+        if (view->round % 2 == 0)
                 gtk_header_bar_set_title(hbar, CF_TITLE_TURN_TWO);
         else
                 gtk_header_bar_set_title(hbar, CF_TITLE_TURN_ONE);

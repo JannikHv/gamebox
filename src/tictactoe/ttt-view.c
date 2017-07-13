@@ -31,13 +31,11 @@ static void ttt_field_enter(GtkWidget *button,
                             TttField *field)
 {
         TttView *view;
-        gint round;
         TttOwner owner, owner_now;
 
         view      = ttt_field_get_view(field);
         owner     = ttt_field_get_owner(field);
-        round     = view->round;
-        owner_now = (round % 2 == 0) ? TTT_OWNER_ONE : TTT_OWNER_TWO;
+        owner_now = (view->round % 2 == 0) ? TTT_OWNER_ONE : TTT_OWNER_TWO;
 
         if (!view->running) return;
 
@@ -66,15 +64,13 @@ static void ttt_field_clicked(GtkWidget *button,
                               TttField *field)
 {
         TttView *view;
-        gint round;
-        TttOwner owner, owner_now;
         GtkHeaderBar *hbar;
+        TttOwner owner, owner_now;
 
         view      = ttt_field_get_view(field);
-        round     = view->round;
-        owner     = ttt_field_get_owner(field);
-        owner_now = (round % 2 == 0) ? TTT_OWNER_ONE : TTT_OWNER_TWO;
         hbar      = GTK_HEADER_BAR(view->hbar);
+        owner     = ttt_field_get_owner(field);
+        owner_now = (view->round % 2 == 0) ? TTT_OWNER_ONE : TTT_OWNER_TWO;
 
         /* Check if game is running */
         if (!view->running) return;
@@ -87,7 +83,7 @@ static void ttt_field_clicked(GtkWidget *button,
 
         /* Check for win */
         if (ttt_check_get_won(view->field)) {
-                if (round % 2 == 0)
+                if (view->round % 2 == 0)
                         gtk_header_bar_set_title(hbar, TTT_TITLE_WON_ONE);
                 else
                         gtk_header_bar_set_title(hbar, TTT_TITLE_WON_TWO);
@@ -97,7 +93,7 @@ static void ttt_field_clicked(GtkWidget *button,
         }
 
         /* Check for draw */
-        if (round == 8) {
+        if (view->round == 8) {
                 gtk_header_bar_set_title(hbar, TTT_TITLE_DRAW);
                 return;
         }

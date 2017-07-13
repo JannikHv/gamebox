@@ -51,7 +51,9 @@ void mill_field_set_owner(MillField *field,
 {
         field->owner = owner;
 
-        GtkStyleContext *context = gtk_widget_get_style_context(field->button);
+        GtkStyleContext *context;
+
+        context = gtk_widget_get_style_context(field->button);
 
         switch (owner) {
         case MILL_OWNER_NONE:
@@ -73,7 +75,9 @@ void mill_field_set_owner(MillField *field,
 void mill_field_set_preowner(MillField *field,
                              MillOwner owner)
 {
-        GtkStyleContext *context = gtk_widget_get_style_context(field->button);
+        GtkStyleContext *context;
+
+        context = gtk_widget_get_style_context(field->button);
 
         switch (owner) {
         case MILL_OWNER_NONE:

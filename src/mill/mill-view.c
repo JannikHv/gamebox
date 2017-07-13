@@ -48,24 +48,22 @@ static void mill_field_enter(GtkWidget *button,
                              MillField *piece)
 {
         MillView *view;
-        MillStatus status;
         MillOwner owner, owner_now;
         gboolean in_range, can_jump;
         gint pieces_left;
 
         view        = mill_field_get_view(piece);
-        status      = view->status;
         owner       = mill_field_get_owner(piece);
         owner_now   = (view->round % 2 == 0) ? MILL_OWNER_ONE : MILL_OWNER_TWO;
         pieces_left = (view->round % 2 == 0) ? view->pieces_one : view->pieces_two;
         can_jump    = (pieces_left > 3) ? FALSE : TRUE;
 
-        if (owner  != MILL_OWNER_NONE  ||
-            status == MILL_STATUS_DONE ||
-            status == MILL_STATUS_TAKE)
+        if (owner        != MILL_OWNER_NONE  ||
+            view->status == MILL_STATUS_DONE ||
+            view->status == MILL_STATUS_TAKE)
                 return;
 
-        if (status == MILL_STATUS_MOVE) {
+        if (view->status == MILL_STATUS_MOVE) {
                 if (!view->last) return;
 
                 in_range = mill_check_get_field_in_range(view->field, view->last, piece);
@@ -80,16 +78,14 @@ static void mill_field_leave(GtkWidget *button,
                              MillField *piece)
 {
         MillView *view;
-        MillStatus status;
         MillOwner owner;
 
         view   = mill_field_get_view(piece);
-        status = view->status;
         owner  = mill_field_get_owner(piece);
 
-        if (owner  != MILL_OWNER_NONE  ||
-            status == MILL_STATUS_DONE ||
-            status == MILL_STATUS_TAKE)
+        if (owner        != MILL_OWNER_NONE  ||
+            view->status == MILL_STATUS_DONE ||
+            view->status == MILL_STATUS_TAKE)
                 return;
 
         mill_field_set_preowner(piece, MILL_OWNER_NONE);
@@ -102,23 +98,21 @@ static void mill_view_set_status(MillView *view,
 
         GtkHeaderBar *hbar;
         const gchar *title;
-        gint round;
 
         hbar  = GTK_HEADER_BAR(view->hbar);
-        round = view->round;
 
         switch (status) {
         case MILL_STATUS_PLACE:
-                title = (round % 2 == 0) ? MILL_TITLE_PLACE_ONE : MILL_TITLE_PLACE_TWO;
+                title = (view->round % 2 == 0) ? MILL_TITLE_PLACE_ONE : MILL_TITLE_PLACE_TWO;
                 break;
         case MILL_STATUS_MOVE:
-                title = (round % 2 == 0) ? MILL_TITLE_MOVE_ONE : MILL_TITLE_MOVE_TWO;
+                title = (view->round % 2 == 0) ? MILL_TITLE_MOVE_ONE : MILL_TITLE_MOVE_TWO;
                 break;
         case MILL_STATUS_TAKE:
-                title = (round % 2 == 0) ? MILL_TITLE_TAKE_ONE : MILL_TITLE_TAKE_TWO;
+                title = (view->round % 2 == 0) ? MILL_TITLE_TAKE_ONE : MILL_TITLE_TAKE_TWO;
                 break;
         case MILL_STATUS_DONE:
-                title = (round % 2 == 0) ? MILL_TITLE_WON_ONE : MILL_TITLE_WON_TWO;
+                title = (view->round % 2 == 0) ? MILL_TITLE_WON_ONE : MILL_TITLE_WON_TWO;
                 break;
         }
 
@@ -129,12 +123,11 @@ static void mill_field_take(MillView *view,
                             MillField *field[7][7],
                             MillField *piece)
 {
-        gint round,free_fields, in_mill, pieces_left;
+        gint free_fields, in_mill, pieces_left;
         MillOwner owner, enemy;
 
-        round       = view->round;
         owner       = mill_field_get_owner(piece);
-        enemy       = (round % 2 == 0) ? MILL_OWNER_TWO : MILL_OWNER_ONE;
+        enemy       = (view->round % 2 == 0) ? MILL_OWNER_TWO : MILL_OWNER_ONE;
         free_fields = mill_check_get_free_fields(field, enemy);
         in_mill     = mill_check_get_field_in_mill(field, piece);
 
@@ -146,7 +139,7 @@ static void mill_field_take(MillView *view,
 
         mill_field_set_owner(piece, MILL_OWNER_NONE);
 
-        pieces_left = (round % 2 == 0) ? --view->pieces_two : --view->pieces_one;
+        pieces_left = (view->round % 2 == 0) ? --view->pieces_two : --view->pieces_one;
 
         /* Check for win */
         if (pieces_left < 3) {
@@ -157,9 +150,7 @@ static void mill_field_take(MillView *view,
         /* Check if two mills have been closed */
         if (--view->mill_cnt > 0) return;
 
-        view->round++;
-
-        if (round > 17)
+        if (++view->round > 17)
                 mill_view_set_status(view, MILL_STATUS_MOVE);
         else
                 mill_view_set_status(view, MILL_STATUS_PLACE);
@@ -171,13 +162,12 @@ static void mill_field_move(MillView *view,
                             MillField *piece)
 {
         gboolean in_range;
-        gint round, pieces_left;
+        gint pieces_left;
         MillOwner owner, owner_now;
 
-        round       = view->round;
-        pieces_left = (round % 2 == 0) ? view->pieces_one : view->pieces_two;
+        pieces_left = (view->round % 2 == 0) ? view->pieces_one : view->pieces_two;
         owner       = mill_field_get_owner(piece);
-        owner_now   = (round % 2 == 0) ? MILL_OWNER_ONE : MILL_OWNER_TWO;
+        owner_now   = (view->round % 2 == 0) ? MILL_OWNER_ONE : MILL_OWNER_TWO;
 
         /* Check if a field got selected */
         if (!view->last) {
@@ -220,12 +210,10 @@ static void mill_field_place(MillView *view,
                              MillField *field[7][7],
                              MillField *piece)
 {
-        gint round;
         MillOwner owner, owner_now;
 
-        round     = view->round;
         owner     = mill_field_get_owner(piece);
-        owner_now = (round % 2 == 0) ? MILL_OWNER_ONE : MILL_OWNER_TWO;
+        owner_now = (view->round % 2 == 0) ? MILL_OWNER_ONE : MILL_OWNER_TWO;
 
         /* Check if field is assigned */
         if (owner != MILL_OWNER_NONE) return;
@@ -241,10 +229,8 @@ static void mill_field_place(MillView *view,
                 return;
         }
 
-        view->round++;
-
         /* Check if all pieces were placed */
-        if (round == 17)
+        if (++view->round == 18)
                 mill_view_set_status(view, MILL_STATUS_MOVE);
         else
                 mill_view_set_status(view, MILL_STATUS_PLACE);

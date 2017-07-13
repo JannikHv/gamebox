@@ -14,9 +14,9 @@ typedef enum {
         MILL_OWNER_TWO,
 } MillOwner;
 
-GtkWidget        *mill_field_get_button         (MillField *field);
+GtkWidget       *mill_field_get_button          (MillField *field);
 
-MillView         *mill_field_get_view           (MillField *field);
+MillView        *mill_field_get_view            (MillField *field);
 
 void             mill_field_set_view            (MillField *field,
                                                  MillView *view);
