@@ -31,7 +31,7 @@
 
 #define GBOX_TITLE_MAIN "GameBox"
 
-#define GBOX_CLASS_ACTION "gbox-action"
+#define GBOX_CLASS_ACTION "suggested-action"
 #define GBOX_CLASS_BUTTON "gbox-button"
 #define GBOX_CLASS_GRID   "gbox-grid"
 #define GBOX_CLASS_WIN    "gbox-window"
@@ -129,10 +129,13 @@ static void view_button_clicked(GtkWidget *button,
                 gtk_window_resize(window, SIZE_CF_X, SIZE_CF_Y);
         } else if (g_strcmp0(label, LABEL_MILL) == 0) {
                 mill_view_set_active(win->view_mill, TRUE);
-                gtk_window_unmaximize(window);
+
+                if (gtk_window_is_maximized(window))
+                        gtk_window_unmaximize(window);
+
                 gtk_window_resize(window, SIZE_MILL_X, SIZE_MILL_Y);
 
-                /* In case the window was maximized, force resize to finish */
+                /* If the window is maximized, force to unmaximize and resize it */
                 gdk_flush();
                 gtk_window_set_resizable(window, FALSE);
         }

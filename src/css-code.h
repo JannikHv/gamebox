@@ -15,18 +15,6 @@
 "        border-radius: 1%;"\
 "        border-width:  7px;"\
 "}"\
-"button.gbox-action {"\
-"        background: #5BAAD2;"\
-"        color:      #FFFFFF;"\
-"}"\
-"button.gbox-action:hover {"\
-"        background: #7EBEDD;"\
-"        color:      #FFFFFF;"\
-"}"\
-"button.gbox-action:active {"\
-"        background: #5BAAD2;"\
-"        color:      #FFFFFF;"\
-"}"\
 "button.ttt-field {"\
 "        background:    #FFFFFF;"\
 "        color:         transparent;"\
