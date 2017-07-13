@@ -25,10 +25,10 @@ static gboolean mill_check_get_is_mill(MillField *group[3])
 gint mill_check_get_free_fields(MillField *field[7][7],
                                 MillOwner  owner)
 {
-        gint i, k, cnt, free;
+        gint i, k, cnt, free_cnt;
         MillOwner tmp;
 
-        free = 0;
+        free_cnt = 0;
 
         for (i=0; i<7; i++) {
                 for (k=0; k<7; k++) {
@@ -37,11 +37,11 @@ gint mill_check_get_free_fields(MillField *field[7][7],
 
                         /* If the field belongs to the enemy and is not in a mill */
                         if (cnt == 0 && tmp == owner)
-                                free++;
+                                free_cnt++;
                 }
         }
 
-        return free;
+        return free_cnt;
 }
 
 gboolean mill_check_get_field_in_range(MillField *field[7][7],
