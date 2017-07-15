@@ -263,11 +263,8 @@ static void mill_field_clicked(GtkWidget *button,
 /**
  * Accessors
  */
-void mill_view_set_active(MillView *view,
-                          gboolean active)
+void mill_view_reset(MillView *view)
 {
-        if (!active) return;
-
         MillOwner owner;
         gint i, k;
 

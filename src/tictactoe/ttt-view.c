@@ -110,16 +110,12 @@ static void ttt_field_clicked(GtkWidget *button,
 /**
  * Accessors
  */
-void ttt_view_set_active(TttView *view,
-                         gboolean active)
+void ttt_view_reset(TttView *view)
 {
-        view->running = active;
-
-        if (!active) return;
-
         GtkHeaderBar *hbar;
         gint i, k;
 
+        view->running = TRUE;
         hbar = GTK_HEADER_BAR(view->hbar);
 
         for (i = 0; i < 3; i++) {
@@ -168,7 +164,7 @@ static void ttt_view_init(TttView *view)
 {
         view->grid    = gtk_grid_new();
         view->hbar    = NULL;
-        view->running = FALSE;
+        view->running = TRUE;
         view->round   = 0;
 
         /* Grid */

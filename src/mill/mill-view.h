@@ -5,8 +5,7 @@
 
 typedef struct _MillView MillView;
 
-void             mill_view_set_active           (MillView *view,
-                                                 gboolean active);
+void             mill_view_reset                (MillView *view);
 
 GtkWidget       *mill_view_get_viewport         (MillView *view);
 

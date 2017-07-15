@@ -115,17 +115,13 @@ static void cf_field_clicked(GtkWidget *button,
 /**
  * Accessors
  */
-void cf_view_set_active(CfView *view,
-                        gboolean active)
+void cf_view_reset(CfView *view)
 {
-        view->running = active;
-
-        if (!active) return;
-
         GtkHeaderBar *hbar;
         GtkWidget *widget, *label;
         gint i, k;
 
+        view->running = TRUE;
         hbar = GTK_HEADER_BAR(view->hbar);
 
         for (i = 0; i < 7; i++) {
@@ -178,7 +174,7 @@ static void cf_view_init(CfView *view)
 {
         view->grid    = gtk_grid_new();
         view->hbar    = NULL;
-        view->running = FALSE;
+        view->running = TRUE;
         view->round   = 0;
 
         /* Grid */

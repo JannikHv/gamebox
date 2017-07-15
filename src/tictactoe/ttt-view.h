@@ -5,8 +5,7 @@
 
 typedef struct _TttView TttView;
 
-void             ttt_view_set_active            (TttView *view,
-                                                 gboolean active);
+void             ttt_view_reset                 (TttView *view);
 
 void             ttt_view_set_header_bar        (TttView *view,
                                                  GtkWidget *hbar);

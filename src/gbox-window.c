@@ -71,6 +71,23 @@ static void load_style_context(void)
                                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
+static void new_game_button_clicked(GtkWidget *button,
+                                    GBoxWindow *win)
+{
+        GtkStack *stack;
+        const gchar *visible_name;
+
+        stack        = GTK_STACK(win->stack);
+        visible_name = gtk_stack_get_visible_child_name(stack);
+
+        if (g_strcmp0(visible_name, LABEL_TTT) == 0)
+                ttt_view_reset(win->view_ttt);
+        else if (g_strcmp0(visible_name, LABEL_CF) == 0)
+                cf_view_reset(win->view_cf);
+        else if (g_strcmp0(visible_name, LABEL_MILL) == 0)
+                mill_view_reset(win->view_mill);
+}
+
 static void back_button_clicked(GtkWidget *button,
                                 GBoxWindow *win)
 {
@@ -82,10 +99,11 @@ static void back_button_clicked(GtkWidget *button,
         window = GTK_WINDOW(win->self);
         hbar   = GTK_HEADER_BAR(win->hbar);
 
-        /* Reset game */
-        ttt_view_set_active(win->view_ttt, TRUE);
-        cf_view_set_active(win->view_cf, TRUE);
-        mill_view_set_active(win->view_mill, TRUE);
+        /**
+         * When going back to the main menu, act as
+         * if the new game button was clicked.
+         */
+        new_game_button_clicked(NULL, win);
 
         gtk_stack_set_visible_child_name(stack, LABEL_MAIN);
         gtk_window_set_resizable(window, TRUE);
@@ -95,23 +113,6 @@ static void back_button_clicked(GtkWidget *button,
         /* Disable sensitivity of header bar buttons */
         gtk_widget_set_sensitive(button, FALSE);
         gtk_widget_set_sensitive(win->btn_new, FALSE);
-}
-
-static void new_game_button_clicked(GtkWidget *button,
-                                    GBoxWindow *win)
-{
-        GtkStack *stack;
-        const gchar *visible_name;
-
-        stack        = GTK_STACK(win->stack);
-        visible_name = gtk_stack_get_visible_child_name(stack);
-
-        if (g_strcmp0(visible_name, LABEL_TTT) == 0)
-                ttt_view_set_active(win->view_ttt, TRUE);
-        else if (g_strcmp0(visible_name, LABEL_CF) == 0)
-                cf_view_set_active(win->view_cf, TRUE);
-        else if (g_strcmp0(visible_name, LABEL_MILL) == 0)
-                mill_view_set_active(win->view_mill, TRUE);
 }
 
 static void view_button_clicked(GtkWidget *button,
@@ -126,13 +127,13 @@ static void view_button_clicked(GtkWidget *button,
         label  = gtk_button_get_label(GTK_BUTTON(button));
 
         if (g_strcmp0(label, LABEL_TTT) == 0) {
-                ttt_view_set_active(win->view_ttt, TRUE);
+                ttt_view_reset(win->view_ttt);
                 gtk_window_resize(window, SIZE_TTT_X, SIZE_TTT_Y);
         } else if (g_strcmp0(label, LABEL_CF) == 0) {
-                cf_view_set_active(win->view_cf, TRUE);
+                cf_view_reset(win->view_cf);
                 gtk_window_resize(window, SIZE_CF_X, SIZE_CF_Y);
         } else if (g_strcmp0(label, LABEL_MILL) == 0) {
-                mill_view_set_active(win->view_mill, TRUE);
+                mill_view_reset(win->view_mill);
 
                 if (gtk_window_is_maximized(window))
                         gtk_window_unmaximize(window);

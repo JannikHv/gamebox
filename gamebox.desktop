@@ -1,5 +1,5 @@
 [Desktop Entry]
-Categories=Game;
+Categories=GTK;Game;BoardGame;
 Encoding=UTF-8
 Exec=/usr/bin/gamebox
 GenericName=Game
