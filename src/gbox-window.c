@@ -91,6 +91,10 @@ static void back_button_clicked(GtkWidget *button,
         gtk_window_set_resizable(window, TRUE);
         gtk_window_resize(window, SIZE_GBOX_X, SIZE_GBOX_Y);
         gtk_header_bar_set_title(hbar, GBOX_TITLE_MAIN);
+
+        /* Disable sensitivity of header bar buttons */
+        gtk_widget_set_sensitive(button, FALSE);
+        gtk_widget_set_sensitive(win->btn_new, FALSE);
 }
 
 static void new_game_button_clicked(GtkWidget *button,
@@ -139,6 +143,10 @@ static void view_button_clicked(GtkWidget *button,
                 gdk_flush();
                 gtk_window_set_resizable(window, FALSE);
         }
+
+        /* Enable sensitivity of header bar buttons */
+        gtk_widget_set_sensitive(win->btn_back, TRUE);
+        gtk_widget_set_sensitive(win->btn_new, TRUE);
 
         gtk_stack_set_visible_child_name(stack, label);
 }
@@ -234,10 +242,12 @@ static void gbox_window_init(GBoxWindow *win)
                                       GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
 
         /* New Game button */
+        gtk_widget_set_sensitive(win->btn_new, FALSE);
         g_signal_connect(win->btn_new, "clicked", G_CALLBACK(new_game_button_clicked), win);
         gtk_style_context_add_class(gtk_widget_get_style_context(win->btn_new), GBOX_CLASS_ACTION);
 
         /* Back button */
+        gtk_widget_set_sensitive(win->btn_back, FALSE);
         g_signal_connect(win->btn_back, "clicked", G_CALLBACK(back_button_clicked), win);
         gtk_button_set_image(GTK_BUTTON(win->btn_back),
                              gtk_image_new_from_icon_name(
