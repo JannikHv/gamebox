@@ -7,10 +7,10 @@ typedef struct _TttView TttView;
 
 void             ttt_view_reset                 (TttView *view);
 
+GtkWidget       *ttt_view_get_viewport          (TttView *view);
+
 void             ttt_view_set_header_bar        (TttView *view,
                                                  GtkWidget *hbar);
-
-GtkWidget       *ttt_view_get_viewport          (TttView *view);
 
 TttView         *ttt_view_new                   (void);
 
