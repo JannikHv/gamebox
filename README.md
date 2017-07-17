@@ -2,7 +2,9 @@
 Gamebox is a collection of minigames written in C using Gtk+\-3.0
 
 **NEWS:**
+
 Gamebox is receiving a new main menu, therefore the work on new games is paused for the time being.
+ 
 This will approximately take up to 3 days, until the 20th of July.
 
 **Finished games:**
