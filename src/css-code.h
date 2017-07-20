@@ -3,17 +3,17 @@
 
 #define CSS_DATA \
 "window.gbox-window {"\
-"       background: #21252D;"\
+"       background: #FFFFFF;"\
 "}"\
-"grid.gbox-grid {"\
-"       background: #21252D;"\
+".sidebar list {"\
+"       background-color: #2F343F;"\
+"       border-width:     0px;"\
 "}"\
-"button.gbox-button {"\
-"        background:    #363E48;"\
-"        color:         transparent;"\
-"        border-color:  #2F343F;"\
-"        border-radius: 1%;"\
-"        border-width:  7px;"\
+".sidebar label {"\
+"       color: #FFFFFF;"\
+"}"\
+".sidebar row {"\
+"       color: transparent;"\
 "}"\
 "button.ttt-field {"\
 "        background:    #FFFFFF;"\

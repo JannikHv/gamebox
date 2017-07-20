@@ -2,7 +2,7 @@ CC = gcc
 
 NAME = gamebox
 
-FLAGS = -g -Wall -Werror -export-dynamic `pkg-config --cflags gtk+-3.0`
+FLAGS = -g -export-dynamic `pkg-config --cflags gtk+-3.0`
 
 LIBS = -export-dynamic `pkg-config --libs gtk+-3.0`
 
@@ -16,6 +16,7 @@ SRCS = src/tictactoe/ttt-view.c    \
        src/mill/mill-field.c       \
        src/mill/mill-check.c       \
        src/gbox-window.c           \
+       src/gbox-preview.c          \
        src/main.c
 
 all: $(SRCS)
@@ -29,6 +30,9 @@ install: $(NAME)
 	install -Dm 0644 gamebox.desktop /usr/share/applications/gamebox.desktop
 	install -Dm 0644 LICENSE /usr/share/licenses/gamebox/LICENSE
 	install -Dm 0644 images/mill.png /usr/share/gamebox/images/mill.png
+	install -Dm 0644 images/tictactoe-preview.png /usr/share/gamebox/images/tictactoe-preview.png
+	install -Dm 0644 images/connect-four-preview.png /usr/share/gamebox/images/connect-four-preview.png
+	install -Dm 0644 images/mill-preview.png /usr/share/gamebox/images/mill-preview.png
 
 uninstall:
 	rm /usr/bin/$(NAME)

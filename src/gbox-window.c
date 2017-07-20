@@ -1,61 +1,57 @@
 #include "gbox-window.h"
-#include "css-code.h"
+#include "gbox-preview.h"
 #include "tictactoe/ttt-view.h"
 #include "connect-four/cf-view.h"
 #include "mill/mill-view.h"
+#include "css-code.h"
 
-#include <gtk/gtk.h>
+#define GBOX_SIZE_WIN_X 670
+#define GBOX_SIZE_WIN_Y 560
 
-#define SIZE_GBOX_X 525
-#define SIZE_GBOX_Y 500
+#define GBOX_SIZE_TTT_X 500
+#define GBOX_SIZE_TTT_Y 500
 
-#define SIZE_TTT_X 500
-#define SIZE_TTT_Y 500
+#define GBOX_SIZE_CF_X 650
+#define GBOX_SIZE_CF_Y 550
 
-#define SIZE_CF_X 650
-#define SIZE_CF_Y 550
+#define GBOX_SIZE_MILL_X 600
+#define GBOX_SIZE_MILL_Y 600
 
-#define SIZE_MILL_X 600
-#define SIZE_MILL_Y 600
+#define GBOX_TITLE_PREV_TTT  "Tic Tac Toe"
+#define GBOX_TITLE_PREV_CF   "Connect Four"
+#define GBOX_TITLE_PREV_MILL "Mill"
 
-#define LABEL_TTT  "Tic Tac Toe"
-#define LABEL_CF   "Connect Four"
-#define LABEL_MILL "Mill"
-#define LABEL_MAIN "Main"
-
-#define MARKUP_TTT  "<span size='25000' color='#FFFFFF'>Tic Tac Toe</span>"
-#define MARKUP_CF   "<span size='25000' color='#FFFFFF'>Connect Four</span>"
-#define MARKUP_MILL "<span size='25000' color='#FFFFFF'>Mill</span>"
-
-#define GBOX_ICON_NAME "applications-games"
+#define GBOX_TITLE_GAME_TTT  "ttt"
+#define GBOX_TITLE_GAME_CF   "cf"
+#define GBOX_TITLE_GAME_MILL "mill"
 
 #define GBOX_TITLE_MAIN "GameBox"
 
-#define GBOX_CLASS_ACTION "suggested-action"
-#define GBOX_CLASS_BUTTON "gbox-button"
-#define GBOX_CLASS_GRID   "gbox-grid"
-#define GBOX_CLASS_WIN    "gbox-window"
+#define GBOX_CLASS_WINDOW "gbox-window"
 
 struct _GBoxWindow {
-        /* Containers */
+        /* Container */
         GtkWidget *self;
         GtkWidget *hbar;
         GtkWidget *grid;
-        GtkWidget *stack;
+        GtkWidget *sidebar;
+        GtkWidget *stack_main;
+        GtkWidget *stack_prev;
+        GtkWidget *stack_game;
 
         /* Header bar widgets */
-        GtkWidget *btn_new;
         GtkWidget *btn_back;
+        GtkWidget *btn_new;
 
-        /* Views */
-        TttView   *view_ttt;
-        CfView    *view_cf;
-        MillView  *view_mill;
+        /* Previews */
+        GBoxPreview *prev_ttt;
+        GBoxPreview *prev_cf;
+        GBoxPreview *prev_mill;
 
-        /* Buttons */
-        GtkWidget *btn_ttt;
-        GtkWidget *btn_cf;
-        GtkWidget *btn_mill;
+        /* Views (Games) */
+        TttView  *view_ttt;
+        CfView   *view_cf;
+        MillView *view_mill;
 };
 
 static void load_style_context(void)
@@ -71,128 +67,181 @@ static void load_style_context(void)
                                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
+static void start_game_button_clicked(GtkWidget *button,
+                                      GBoxWindow *win)
+{
+        GtkWidget *visible_child;
+        GtkWindow *window;
+        GtkStack *stack_main, *stack_prev, *stack_game;
+        const gchar *title_prev, *title_game;
+        gboolean resizable;
+        gint size_x, size_y;
+
+        visible_child = win->stack_game;
+        window        = GTK_WINDOW(win->self);
+        stack_main    = GTK_STACK(win->stack_main);
+        stack_prev    = GTK_STACK(win->stack_prev);
+        stack_game    = GTK_STACK(win->stack_game);
+        title_prev    = gtk_stack_get_visible_child_name(stack_prev);
+        resizable     = TRUE;
+
+        if (g_strcmp0(title_prev, GBOX_TITLE_PREV_TTT) == 0) {
+                ttt_view_reset(win->view_ttt);
+                title_game = GBOX_TITLE_GAME_TTT;
+                size_x = GBOX_SIZE_TTT_X;
+                size_y = GBOX_SIZE_TTT_Y;
+        } else if (g_strcmp0(title_prev, GBOX_TITLE_PREV_CF) == 0) {
+                cf_view_reset(win->view_cf);
+                title_game = GBOX_TITLE_GAME_CF;
+                size_x = GBOX_SIZE_CF_X;
+                size_y = GBOX_SIZE_CF_Y;
+        } else if (g_strcmp0(title_prev, GBOX_TITLE_PREV_MILL) == 0) {
+                mill_view_reset(win->view_mill);
+                title_game = GBOX_TITLE_GAME_MILL;
+                resizable = FALSE;
+                size_x = GBOX_SIZE_MILL_X;
+                size_y = GBOX_SIZE_MILL_Y;
+        }
+
+        /* Hide preview stack in order to resize the window properly */
+        gtk_widget_hide(win->stack_prev);
+
+        /* Resize window properly */
+        gtk_stack_set_visible_child_name(stack_game, title_game);
+        gtk_stack_set_visible_child(stack_main, visible_child);
+        gtk_window_set_default_size(window, size_x, size_y);
+        gtk_window_resize(window, size_x, size_y);
+        gdk_flush();
+        gtk_window_set_resizable(window, resizable);
+
+        /* Make header bar buttons sensitive */
+        gtk_widget_set_sensitive(win->btn_back, TRUE);
+        gtk_widget_set_sensitive(win->btn_new, TRUE);
+}
+
 static void new_game_button_clicked(GtkWidget *button,
                                     GBoxWindow *win)
 {
-        GtkStack *stack;
+        GtkStack *stack_game;
         const gchar *visible_name;
 
-        stack        = GTK_STACK(win->stack);
-        visible_name = gtk_stack_get_visible_child_name(stack);
+        stack_game   = GTK_STACK(win->stack_game);
+        visible_name = gtk_stack_get_visible_child_name(stack_game);
 
-        if (g_strcmp0(visible_name, LABEL_TTT) == 0)
+        /* Reset game */
+        if (g_strcmp0(visible_name, GBOX_TITLE_GAME_TTT) == 0)
                 ttt_view_reset(win->view_ttt);
-        else if (g_strcmp0(visible_name, LABEL_CF) == 0)
+        else if (g_strcmp0(visible_name, GBOX_TITLE_GAME_CF) == 0)
                 cf_view_reset(win->view_cf);
-        else if (g_strcmp0(visible_name, LABEL_MILL) == 0)
+        else if (g_strcmp0(visible_name, GBOX_TITLE_GAME_MILL) == 0)
                 mill_view_reset(win->view_mill);
 }
 
 static void back_button_clicked(GtkWidget *button,
                                 GBoxWindow *win)
 {
-        GtkStack *stack;
         GtkWindow *window;
         GtkHeaderBar *hbar;
+        GtkWidget *visible_child;
+        GtkStack *stack_main, *stack_game;
+        const gchar *visible_name;
+        gboolean resizable;
 
-        stack  = GTK_STACK(win->stack);
-        window = GTK_WINDOW(win->self);
-        hbar   = GTK_HEADER_BAR(win->hbar);
+        window        = GTK_WINDOW(win->self);
+        hbar          = GTK_HEADER_BAR(win->hbar);
+        visible_child = win->stack_prev;
+        stack_main    = GTK_STACK(win->stack_main);
+        stack_game    = GTK_STACK(win->stack_game);
+        visible_name  = gtk_stack_get_visible_child_name(stack_game);
+        resizable     = gtk_window_get_resizable(window);
 
-        /**
-         * When going back to the main menu, act as
-         * if the new game button was clicked.
-         */
-        new_game_button_clicked(NULL, win);
-
-        gtk_stack_set_visible_child_name(stack, LABEL_MAIN);
-        gtk_window_set_resizable(window, TRUE);
-        gtk_window_resize(window, SIZE_GBOX_X, SIZE_GBOX_Y);
-        gtk_header_bar_set_title(hbar, GBOX_TITLE_MAIN);
-
-        /* Disable sensitivity of header bar buttons */
-        gtk_widget_set_sensitive(button, FALSE);
-        gtk_widget_set_sensitive(win->btn_new, FALSE);
-}
-
-static void view_button_clicked(GtkWidget *button,
-                                GBoxWindow *win)
-{
-        GtkStack *stack;
-        GtkWindow *window;
-        const gchar *label;
-
-        stack  = GTK_STACK(win->stack);
-        window = GTK_WINDOW(win->self);
-        label  = gtk_button_get_label(GTK_BUTTON(button));
-
-        if (g_strcmp0(label, LABEL_TTT) == 0) {
+        /* Reset game */
+        if (g_strcmp0(visible_name, GBOX_TITLE_GAME_TTT) == 0)
                 ttt_view_reset(win->view_ttt);
-                gtk_window_resize(window, SIZE_TTT_X, SIZE_TTT_Y);
-        } else if (g_strcmp0(label, LABEL_CF) == 0) {
+        else if (g_strcmp0(visible_name, GBOX_TITLE_GAME_CF) == 0)
                 cf_view_reset(win->view_cf);
-                gtk_window_resize(window, SIZE_CF_X, SIZE_CF_Y);
-        } else if (g_strcmp0(label, LABEL_MILL) == 0) {
+        else if (g_strcmp0(visible_name, GBOX_TITLE_GAME_MILL) == 0)
                 mill_view_reset(win->view_mill);
 
-                if (gtk_window_is_maximized(window))
-                        gtk_window_unmaximize(window);
+        ttt_view_reset(win->view_ttt);
+        cf_view_reset(win->view_cf);
+        mill_view_reset(win->view_mill);
 
-                gtk_window_resize(window, SIZE_MILL_X, SIZE_MILL_Y);
+        /* Show preview stack again */
+        gtk_widget_show(win->stack_prev);
 
-                /* If the window is maximized, force to unmaximize and resize it */
-                gdk_flush();
-                gtk_window_set_resizable(window, FALSE);
-        }
+        if (!resizable)
+                gtk_window_set_resizable(window, TRUE);
 
-        /* Enable sensitivity of header bar buttons */
-        gtk_widget_set_sensitive(win->btn_back, TRUE);
-        gtk_widget_set_sensitive(win->btn_new, TRUE);
+        gtk_window_set_default_size(window, GBOX_SIZE_WIN_X, GBOX_SIZE_WIN_Y);
+        gtk_window_resize(window, GBOX_SIZE_WIN_X, GBOX_SIZE_WIN_Y);
+        gtk_stack_set_visible_child(stack_main, win->grid);
 
-        gtk_stack_set_visible_child_name(stack, label);
+        /* Change header bar title */
+        gtk_header_bar_set_title(hbar, GBOX_TITLE_MAIN);
+
+        /* Turn sensitivity of header bar buttons off */
+        gtk_widget_set_sensitive(win->btn_back, FALSE);
+        gtk_widget_set_sensitive(win->btn_new, FALSE);
 }
 
 static void gbox_window_add_interface(GBoxWindow *win)
 {
-        GtkStyleContext *context;
-        GtkStack *stack;
-        GtkGrid *grid;
+        GtkStack *stack_prev, *stack_game;
+        GtkWidget *button;
         gint i;
 
-        stack = GTK_STACK(win->stack);
-        grid  = GTK_GRID(win->grid);
+        stack_prev = GTK_STACK(win->stack_prev);
+        stack_game = GTK_STACK(win->stack_game);
 
-        GtkWidget *button[3] = {win->btn_ttt, win->btn_cf, win->btn_mill};
-        gchar *label[3]      = {LABEL_TTT, LABEL_CF, LABEL_MILL};
-        gchar *markup[3]     = {MARKUP_TTT, MARKUP_CF, MARKUP_MILL};
-
-        GtkWidget *child[3] = {
-                gtk_bin_get_child(GTK_BIN(win->btn_ttt)),
-                gtk_bin_get_child(GTK_BIN(win->btn_cf)),
-                gtk_bin_get_child(GTK_BIN(win->btn_mill)),
+        const gchar *title_prev[3] = {
+                GBOX_TITLE_PREV_TTT,
+                GBOX_TITLE_PREV_CF,
+                GBOX_TITLE_PREV_MILL,
         };
 
-        GtkWidget *view[3] = {
+        const gchar *title_game[3] = {
+                GBOX_TITLE_GAME_TTT,
+                GBOX_TITLE_GAME_CF,
+                GBOX_TITLE_GAME_MILL,
+        };
+
+        const gchar *image_name[3] = {
+                "tictactoe-preview.png",
+                "connect-four-preview.png",
+                "mill-preview.png",
+        };
+
+        GtkWidget *view_prev[3] = {
+                gbox_preview_get_viewport(win->prev_ttt),
+                gbox_preview_get_viewport(win->prev_cf),
+                gbox_preview_get_viewport(win->prev_mill),
+        };
+
+        GtkWidget *view_game[3] = {
                 ttt_view_get_viewport(win->view_ttt),
                 cf_view_get_viewport(win->view_cf),
                 mill_view_get_viewport(win->view_mill),
         };
 
-        gtk_stack_add_titled(stack, win->grid, LABEL_MAIN, LABEL_MAIN);
+        GBoxPreview *preview[3] = {
+                win->prev_ttt,
+                win->prev_cf,
+                win->prev_mill,
+        };
 
         for (i = 0; i < 3; i++) {
-                gtk_stack_add_titled(stack, view[i], label[i], label[i]);
-                gtk_label_set_markup(GTK_LABEL(child[i]), markup[i]);
-                gtk_grid_attach(grid, button[i], 0, i, 1, 1);
-                g_signal_connect(button[i], "clicked", G_CALLBACK(view_button_clicked), win);
-                gtk_container_set_border_width(GTK_CONTAINER(button[i]), 7);
+                gtk_stack_add_titled(stack_prev, view_prev[i], title_prev[i], title_prev[i]);
+                gtk_stack_add_titled(stack_game, view_game[i], title_game[i], title_game[i]);
 
-                /* Add style to button */
-                context = gtk_widget_get_style_context(button[i]);
-                gtk_style_context_add_class(context, GBOX_CLASS_BUTTON);
+                gbox_preview_set_title(preview[i], title_prev[i]);
+                gbox_preview_set_image_name(preview[i], image_name[i]);
+
+                button = gbox_preview_get_start_button(preview[i]);
+                g_signal_connect(button, "clicked", G_CALLBACK(start_game_button_clicked), win);
         }
 
-        /* Connect header bar to views */
+        /* Connect header bar to games */
         ttt_view_set_header_bar(win->view_ttt, win->hbar);
         cf_view_set_header_bar(win->view_cf, win->hbar);
         mill_view_set_header_bar(win->view_mill, win->hbar);
@@ -200,60 +249,71 @@ static void gbox_window_add_interface(GBoxWindow *win)
 
 static void gbox_window_init(GBoxWindow *win)
 {
-        win->self  = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-        win->hbar  = gtk_header_bar_new();
-        win->grid  = gtk_grid_new();
-        win->stack = gtk_stack_new();
+        win->self       = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+        win->hbar       = gtk_header_bar_new();
+        win->grid       = gtk_grid_new();
+        win->sidebar    = gtk_stack_sidebar_new();
+        win->stack_main = gtk_stack_new();
+        win->stack_prev = gtk_stack_new();
+        win->stack_game = gtk_stack_new();
 
-        win->btn_new  = gtk_button_new_with_label("New Game");
         win->btn_back = gtk_button_new();
+        win->btn_new  = gtk_button_new_with_label("New Game");
+
+        win->prev_ttt  = gbox_preview_new();
+        win->prev_cf   = gbox_preview_new();
+        win->prev_mill = gbox_preview_new();
 
         win->view_ttt  = ttt_view_new();
         win->view_cf   = cf_view_new();
         win->view_mill = mill_view_new();
 
-        win->btn_ttt  = gtk_button_new_with_label(LABEL_TTT);
-        win->btn_cf   = gtk_button_new_with_label(LABEL_CF);
-        win->btn_mill = gtk_button_new_with_label(LABEL_MILL);
-
         /* Window */
-        gtk_window_set_default_size(GTK_WINDOW(win->self), SIZE_GBOX_X, SIZE_GBOX_Y);
-        gtk_window_set_position(GTK_WINDOW(win->self), GTK_WIN_POS_CENTER);
+        gtk_style_context_add_class(gtk_widget_get_style_context(win->self), GBOX_CLASS_WINDOW);
+        gtk_window_set_default_size(GTK_WINDOW(win->self), GBOX_SIZE_WIN_X, GBOX_SIZE_WIN_Y);
         gtk_window_set_titlebar(GTK_WINDOW(win->self), win->hbar);
-        gtk_window_set_default_icon_name(GBOX_ICON_NAME);
+        gtk_window_set_position(GTK_WINDOW(win->self), GTK_WIN_POS_CENTER);
         gbox_window_add_interface(win);
-        gtk_container_add(GTK_CONTAINER(win->self), win->stack);
+        gtk_container_add(GTK_CONTAINER(win->self), win->stack_main);
         g_signal_connect(win->self, "delete-event", gtk_main_quit, NULL);
-        gtk_style_context_add_class(gtk_widget_get_style_context(win->self), GBOX_CLASS_WIN);
 
         /* Header bar */
-        gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(win->hbar), TRUE);
         gtk_header_bar_set_title(GTK_HEADER_BAR(win->hbar), GBOX_TITLE_MAIN);
+        gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(win->hbar), TRUE);
         gtk_header_bar_pack_start(GTK_HEADER_BAR(win->hbar), win->btn_back);
         gtk_header_bar_pack_end(GTK_HEADER_BAR(win->hbar), win->btn_new);
 
         /* Grid */
-        gtk_grid_set_column_homogeneous(GTK_GRID(win->grid), TRUE);
-        gtk_grid_set_row_homogeneous(GTK_GRID(win->grid), TRUE);
-        gtk_container_set_border_width(GTK_CONTAINER(win->grid), 25);
-        gtk_style_context_add_class(gtk_widget_get_style_context(win->grid), GBOX_CLASS_GRID);
+        gtk_grid_attach(GTK_GRID(win->grid), win->sidebar,    0, 0, 1, 1);
+        gtk_grid_attach(GTK_GRID(win->grid), win->stack_prev, 1, 0, 1, 1);
 
-        /* Stack */
-        gtk_stack_set_transition_type(GTK_STACK(win->stack),
-                                      GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
+        /* Sidebar */
+        gtk_stack_sidebar_set_stack(GTK_STACK_SIDEBAR(win->sidebar), GTK_STACK(win->stack_prev));
+        gtk_widget_set_size_request(win->sidebar, 180, -1);
+        gtk_widget_set_vexpand(win->sidebar, TRUE);
 
-        /* New Game button */
-        gtk_widget_set_sensitive(win->btn_new, FALSE);
-        g_signal_connect(win->btn_new, "clicked", G_CALLBACK(new_game_button_clicked), win);
-        gtk_style_context_add_class(gtk_widget_get_style_context(win->btn_new), GBOX_CLASS_ACTION);
+        /* Main stack */
+        gtk_stack_add_titled(GTK_STACK(win->stack_main), win->grid, "Prev", "Prev");
+        gtk_stack_add_titled(GTK_STACK(win->stack_main), win->stack_game, "Game", "Game");
+
+        /* Preview stack */
+        gtk_stack_set_transition_type(GTK_STACK(win->stack_prev), GTK_STACK_TRANSITION_TYPE_SLIDE_UP_DOWN);
+        gtk_stack_set_transition_duration(GTK_STACK(win->stack_prev), 500);
+        gtk_widget_set_vexpand(win->stack_prev, TRUE);
+        gtk_widget_set_hexpand(win->stack_prev, TRUE);
 
         /* Back button */
-        gtk_widget_set_sensitive(win->btn_back, FALSE);
         g_signal_connect(win->btn_back, "clicked", G_CALLBACK(back_button_clicked), win);
+        gtk_widget_set_sensitive(win->btn_back, FALSE);
         gtk_button_set_image(GTK_BUTTON(win->btn_back),
                              gtk_image_new_from_icon_name(
                              "go-previous-symbolic",
                              GTK_ICON_SIZE_BUTTON));
+
+        /* New game button */
+        g_signal_connect(win->btn_new, "clicked", G_CALLBACK(new_game_button_clicked), win);
+        gtk_widget_set_sensitive(win->btn_new, FALSE);
+        gtk_style_context_add_class(gtk_widget_get_style_context(win->btn_new), "suggested-action");
 
         load_style_context();
 }
