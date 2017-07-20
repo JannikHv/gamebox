@@ -27,7 +27,7 @@ Gamebox is a collection of minigames written in C using Gtk+\-3.0
     $ sudo make install
 
 # Main menu
-![alt tag](http://i.imgur.com/KaLXWfN.png)
+![alt tag](http://i.imgur.com/8ZYcH1P.png)
 
 # Tic Tac Toe
 ![alt tag](http://i.imgur.com/0tP8p0l.png)
