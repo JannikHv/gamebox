@@ -5,9 +5,9 @@ Gamebox is a collection of minigames written in C using Gtk+\-3.0
 * Tic Tac Toe
 * Connect Four
 * Mill
+* Checkers
 
 **In progress:**
-* Checkers
 * Reversi
 
 # Installation
