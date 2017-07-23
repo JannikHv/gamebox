@@ -21,7 +21,9 @@ static const gchar *get_markup_from_title(const gchar *title)
         static const gchar *markup_p1 = "<span size='25000' color='#21242C'><u>";
         static const gchar *markup_p2 = "</u>\n</span>";
 
-        length = 52 + strlen(title);
+        static gint markup_length = 50;
+
+        length = + markup_length + strlen(title) + 1;
         markup = g_malloc(sizeof(char) * length);
 
         strcpy(markup, markup_p1);
@@ -38,13 +40,47 @@ static const gchar *get_image_path_from_name(const gchar *name)
 
         static const gchar *path_default = "/usr/share/gamebox/images/";
 
-        length = 27 + strlen(name);
+        static gint path_default_length = 26;
+
+        length = path_default_length + strlen(name) + 1;
         path   = g_malloc(sizeof(char) * length);
 
         strcpy(path, path_default);
         strcat(path, name);
 
         return path;
+}
+
+static void gbox_preview_add_interface(GBoxPreview *preview)
+{
+        GtkGrid *grid;
+        GtkWidget *placeholder;
+
+        grid        = GTK_GRID(preview->grid);
+        placeholder = gtk_label_new(NULL);
+
+        gtk_grid_attach(grid, preview->title,     0, 0, 4, 3);
+        gtk_grid_attach(grid, preview->image,     0, 3, 4, 3);
+        gtk_grid_attach(grid, placeholder,        0, 6, 4, 1);
+        gtk_grid_attach(grid, preview->btn_start, 1, 7, 2, 2);
+}
+
+static void gbox_preview_init(GBoxPreview *preview)
+{
+        preview->grid      = gtk_grid_new();
+        preview->title     = gtk_label_new(NULL);
+        preview->image     = gtk_image_new();
+        preview->btn_start = gtk_button_new_with_label("Start Game");
+
+        /* Grid */
+        gtk_container_set_border_width(GTK_CONTAINER(preview->grid), 20);
+        gtk_grid_set_column_homogeneous(GTK_GRID(preview->grid), TRUE);
+
+        /* Add style to button */
+        GtkStyleContext *context = gtk_widget_get_style_context(preview->btn_start);
+        gtk_style_context_add_class(context, "suggested-action");
+
+        gbox_preview_add_interface(preview);
 }
 
 /**
@@ -82,38 +118,6 @@ void gbox_preview_set_image_name(GBoxPreview *preview,
 GtkWidget *gbox_preview_get_start_button(GBoxPreview *preview)
 {
         return preview->btn_start;
-}
-
-static void gbox_preview_add_interface(GBoxPreview *preview)
-{
-        GtkGrid *grid;
-        GtkWidget *placeholder;
-
-        grid        = GTK_GRID(preview->grid);
-        placeholder = gtk_label_new(NULL);
-
-        gtk_grid_attach(grid, preview->title,     0, 0, 4, 3);
-        gtk_grid_attach(grid, preview->image,     0, 3, 4, 3);
-        gtk_grid_attach(grid, placeholder,        0, 6, 4, 1);
-        gtk_grid_attach(grid, preview->btn_start, 1, 7, 2, 2);
-}
-
-static void gbox_preview_init(GBoxPreview *preview)
-{
-        preview->grid      = gtk_grid_new();
-        preview->title     = gtk_label_new(NULL);
-        preview->image     = gtk_image_new();
-        preview->btn_start = gtk_button_new_with_label("Start Game");
-
-        /* Grid */
-        gtk_container_set_border_width(GTK_CONTAINER(preview->grid), 20);
-        gtk_grid_set_column_homogeneous(GTK_GRID(preview->grid), TRUE);
-
-        /* Add style to button */
-        GtkStyleContext *context = gtk_widget_get_style_context(preview->btn_start);
-        gtk_style_context_add_class(context, "suggested-action");
-
-        gbox_preview_add_interface(preview);
 }
 
 GBoxPreview *gbox_preview_new(void)

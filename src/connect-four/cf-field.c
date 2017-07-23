@@ -5,8 +5,8 @@
 
 #define CF_CLASS_FIELD "cf-field"
 
-#define CF_CLASS_ONE "cf-player1"
-#define CF_CLASS_TWO "cf-player2"
+#define CF_CLASS_ONE "cf-player-one"
+#define CF_CLASS_TWO "cf-player-two"
 
 struct _CfField {
         /* Widget */
@@ -20,6 +20,20 @@ struct _CfField {
         gint col;
         gint row;
 };
+
+static void cf_field_init(CfField *field)
+{
+        field->button = gtk_button_new_with_label("");
+        field->view   = NULL;
+        field->owner  = CF_OWNER_NONE;
+
+        /* Button */
+        gtk_container_set_border_width(GTK_CONTAINER(field->button), 10);
+
+        /* Add style to button */
+        GtkStyleContext *context = gtk_widget_get_style_context(field->button);
+        gtk_style_context_add_class(context, CF_CLASS_FIELD);
+}
 
 /**
  * Accessors
@@ -102,20 +116,6 @@ gint cf_field_get_col(CfField *field)
 gint cf_field_get_row(CfField *field)
 {
         return field->row;
-}
-
-static void cf_field_init(CfField *field)
-{
-        field->button = gtk_button_new_with_label("");
-        field->view   = NULL;
-        field->owner  = CF_OWNER_NONE;
-
-        /* Button */
-        gtk_container_set_border_width(GTK_CONTAINER(field->button), 10);
-
-        /* Add style to button */
-        GtkStyleContext *context = gtk_widget_get_style_context(field->button);
-        gtk_style_context_add_class(context, CF_CLASS_FIELD);
 }
 
 CfField *cf_field_new_at(gint col,

@@ -169,20 +169,16 @@ static void mill_field_move(MillView *view,
         owner       = mill_field_get_owner(piece);
         owner_now   = (view->round % 2 == 0) ? MILL_OWNER_ONE : MILL_OWNER_TWO;
 
-        /* Check if a field got selected */
-        if (!view->last) {
-                if (owner_now == owner)
-                        view->last = piece;
-
-                return;
-        }
-
-        /* Check if field should change */
-        if (owner_now == owner) {
+        /* Check the field to move */
+        if (owner == owner_now) {
                 view->last = piece;
                 return;
         }
 
+        /* Check if field to move is selected */
+        if (!view->last) return;
+
+        /* Check destination field */
         if (owner != MILL_OWNER_NONE) return;
 
         /* Check if destination is out of range */
@@ -260,42 +256,6 @@ static void mill_field_clicked(GtkWidget *button,
         }
 }
 
-/**
- * Accessors
- */
-void mill_view_reset(MillView *view)
-{
-        MillOwner owner;
-        gint i, k;
-
-        for (i = 0; i < 7; i++) {
-                for (k = 0; k < 7; k++) {
-                        owner = mill_field_get_owner(view->field[i][k]);
-
-                        if (owner == MILL_OWNER_BLOCK) continue;
-
-                        mill_field_set_owner(view->field[i][k], MILL_OWNER_NONE);
-                }
-        }
-
-        view->round      = 0;
-        view->pieces_one = 9;
-        view->pieces_two = 9;
-
-        mill_view_set_status(view, MILL_STATUS_PLACE);
-}
-
-GtkWidget *mill_view_get_viewport(MillView *view)
-{
-        return view->grid;
-}
-
-void mill_view_set_header_bar(MillView *view,
-                              GtkWidget *hbar)
-{
-        view->hbar = hbar;
-}
-
 static void mill_view_add_fields(MillView *view,
                                  MillField *field[7][7])
 {
@@ -344,6 +304,42 @@ static void mill_view_init(MillView *view)
         gtk_grid_set_column_homogeneous(GTK_GRID(view->grid), TRUE);
         gtk_grid_set_row_homogeneous(GTK_GRID(view->grid), TRUE);
         mill_view_add_fields(view, view->field);
+}
+
+/**
+ * Accessors
+ */
+void mill_view_reset(MillView *view)
+{
+        MillOwner owner;
+        gint i, k;
+
+        for (i = 0; i < 7; i++) {
+                for (k = 0; k < 7; k++) {
+                        owner = mill_field_get_owner(view->field[i][k]);
+
+                        if (owner == MILL_OWNER_BLOCK) continue;
+
+                        mill_field_set_owner(view->field[i][k], MILL_OWNER_NONE);
+                }
+        }
+
+        view->round      = 0;
+        view->pieces_one = 9;
+        view->pieces_two = 9;
+
+        mill_view_set_status(view, MILL_STATUS_PLACE);
+}
+
+GtkWidget *mill_view_get_viewport(MillView *view)
+{
+        return view->grid;
+}
+
+void mill_view_set_header_bar(MillView *view,
+                              GtkWidget *hbar)
+{
+        view->hbar = hbar;
 }
 
 MillView *mill_view_new(void)

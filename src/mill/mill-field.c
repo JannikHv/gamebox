@@ -22,6 +22,61 @@ struct _MillField {
         gint row;
 };
 
+static MillOwner mill_field_get_initial_owner(MillField *field)
+{
+        gint col, row;
+        gint i, k;
+
+        col = field->col;
+        row = field->row;
+
+        static gint block_x[6][4] = {
+                {1, 2, 4, 5}, {0, 2, 4, 6}, {0, 1, 5, 6},
+                {0, 1, 5, 6}, {0, 2, 4, 6}, {1, 2, 4, 5},
+        };
+
+        static gint block_y[6][4] = {
+                {0, 0, 0, 0}, {1, 1, 1, 1}, {2, 2, 2, 2},
+                {4, 4, 4, 4}, {5, 5, 5, 5}, {6, 6, 6, 6},
+        };
+
+        /* Middle piece exception */
+        if (col == 3 && row == 3)
+                return MILL_OWNER_BLOCK;
+
+        for (i = 0; i < 6; i++) {
+                for (k = 0; k < 4; k++) {
+                        if (col == block_x[i][k] &&
+                            row == block_y[i][k])
+                                return MILL_OWNER_BLOCK;
+                }
+        }
+
+        return MILL_OWNER_NONE;
+}
+
+static void mill_field_init(MillField *field)
+{
+        field->view  = NULL;
+        field->owner = mill_field_get_initial_owner(field);
+
+        /* Add style to widget */
+        GtkStyleContext *context;
+        const gchar *class_name;
+
+        if (field->owner == MILL_OWNER_NONE) {
+                field->button = gtk_button_new();
+                gtk_container_set_border_width(GTK_CONTAINER(field->button), 10);
+                class_name = MILL_CLASS_FIELD;
+        } else {
+                field->button = gtk_label_new(NULL);
+                class_name = MILL_CLASS_BLOCK;
+        }
+
+        context = gtk_widget_get_style_context(field->button);
+        gtk_style_context_add_class(context, class_name);
+}
+
 /**
  * Accessors
  */
@@ -104,60 +159,6 @@ gint mill_field_get_col(MillField *field)
 gint mill_field_get_row(MillField *field)
 {
         return field->row;
-}
-
-static MillOwner mill_field_get_initial_owner(MillField *field)
-{
-        gint col, row;
-        gint i, k;
-
-        col = field->col;
-        row = field->row;
-
-        static gint block_x[6][4] = {
-                {1, 2, 4, 5}, {0, 2, 4, 6}, {0, 1, 5, 6},
-                {0, 1, 5, 6}, {0, 2, 4, 6}, {1, 2, 4, 5},
-        };
-
-        static gint block_y[6][4] = {
-                {0, 0, 0, 0}, {1, 1, 1, 1}, {2, 2, 2, 2},
-                {4, 4, 4, 4}, {5, 5, 5, 5}, {6, 6, 6, 6},
-        };
-
-        /* Middle piece exception */
-        if (col == 3 && row == 3)
-                return MILL_OWNER_BLOCK;
-
-        for (i = 0; i < 6; i++) {
-                for (k = 0; k < 4; k++) {
-                        if (col == block_x[i][k] &&
-                            row == block_y[i][k])
-                                return MILL_OWNER_BLOCK;
-                }
-        }
-
-        return MILL_OWNER_NONE;
-}
-
-static void mill_field_init(MillField *field)
-{
-        field->view  = NULL;
-        field->owner = mill_field_get_initial_owner(field);
-
-        GtkStyleContext *context;
-        const gchar *class_name;
-
-        if (field->owner == MILL_OWNER_NONE) {
-                field->button = gtk_button_new();
-                gtk_container_set_border_width(GTK_CONTAINER(field->button), 10);
-                class_name = MILL_CLASS_FIELD;
-        } else {
-                field->button = gtk_label_new(NULL);
-                class_name = MILL_CLASS_BLOCK;
-        }
-
-        context = gtk_widget_get_style_context(field->button);
-        gtk_style_context_add_class(context, class_name);
 }
 
 MillField *mill_field_new_at(gint col,

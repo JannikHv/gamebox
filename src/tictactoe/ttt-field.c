@@ -23,6 +23,18 @@ struct _TttField {
         TttOwner owner;
 };
 
+static void ttt_field_init(TttField *field)
+{
+        field->button = gtk_button_new_with_label("");
+        field->label  = gtk_bin_get_child(GTK_BIN(field->button));
+        field->view   = NULL;
+        field->owner  = TTT_OWNER_NONE;
+
+        /* Add style to button */
+        GtkStyleContext *context = gtk_widget_get_style_context(field->button);
+        gtk_style_context_add_class(context, TTT_CLASS_FIELD);
+}
+
 /**
  * Accessors
  */
@@ -87,18 +99,6 @@ void ttt_field_set_preowner(TttField *field,
                 gtk_label_set_markup(label, TTT_PRE_MARKUP_TWO);
                 break;
         }
-}
-
-static void ttt_field_init(TttField *field)
-{
-        field->button = gtk_button_new_with_label("");
-        field->label  = gtk_bin_get_child(GTK_BIN(field->button));
-        field->view   = NULL;
-        field->owner  = TTT_OWNER_NONE;
-
-        /* Add style to button */
-        GtkStyleContext *context = gtk_widget_get_style_context(field->button);
-        gtk_style_context_add_class(context, TTT_CLASS_FIELD);
 }
 
 TttField *ttt_field_new(void)

@@ -2,7 +2,7 @@ CC = gcc
 
 NAME = gamebox
 
-FLAGS = -g -export-dynamic `pkg-config --cflags gtk+-3.0`
+FLAGS = -g -Werror -Wall -export-dynamic `pkg-config --cflags gtk+-3.0`
 
 LIBS = -export-dynamic `pkg-config --libs gtk+-3.0`
 
@@ -15,6 +15,9 @@ SRCS = src/tictactoe/ttt-view.c    \
        src/mill/mill-view.c        \
        src/mill/mill-field.c       \
        src/mill/mill-check.c       \
+       src/checkers/chks-view.c    \
+       src/checkers/chks-field.c   \
+       src/checkers/chks-check.c   \
        src/gbox-window.c           \
        src/gbox-preview.c          \
        src/main.c
@@ -33,6 +36,8 @@ install: $(NAME)
 	install -Dm 0644 images/tictactoe-preview.png /usr/share/gamebox/images/tictactoe-preview.png
 	install -Dm 0644 images/connect-four-preview.png /usr/share/gamebox/images/connect-four-preview.png
 	install -Dm 0644 images/mill-preview.png /usr/share/gamebox/images/mill-preview.png
+	install -Dm 0644 images/checkers-preview.png /usr/share/gamebox/images/checkers-preview.png
+	install -Dm 0644 images/checkers.png /usr/share/gamebox/images/checkers.png
 
 uninstall:
 	rm /usr/bin/$(NAME)

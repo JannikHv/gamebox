@@ -107,37 +107,6 @@ static void ttt_field_clicked(GtkWidget *button,
         view->round++;
 }
 
-/**
- * Accessors
- */
-void ttt_view_reset(TttView *view)
-{
-        GtkHeaderBar *hbar;
-        gint i, k;
-
-        view->running = TRUE;
-        hbar = GTK_HEADER_BAR(view->hbar);
-
-        for (i = 0; i < 3; i++) {
-                for (k = 0; k < 3; k++)
-                        ttt_field_set_owner(view->field[i][k], TTT_OWNER_NONE);
-        }
-
-        gtk_header_bar_set_title(hbar, TTT_TITLE_TURN_ONE);
-        view->round = 0;
-}
-
-GtkWidget *ttt_view_get_viewport(TttView *view)
-{
-        return view->grid;
-}
-
-void ttt_view_set_header_bar(TttView *view,
-                             GtkWidget *hbar)
-{
-        view->hbar = hbar;
-}
-
 static void ttt_view_add_fields(TttView *view,
                                 TttField *field[3][3])
 {
@@ -171,6 +140,37 @@ static void ttt_view_init(TttView *view)
         gtk_grid_set_column_homogeneous(GTK_GRID(view->grid), TRUE);
         gtk_grid_set_row_homogeneous(GTK_GRID(view->grid), TRUE);
         ttt_view_add_fields(view, view->field);
+}
+
+/**
+ * Accessors
+ */
+void ttt_view_reset(TttView *view)
+{
+        GtkHeaderBar *hbar;
+        gint i, k;
+
+        view->running = TRUE;
+        hbar = GTK_HEADER_BAR(view->hbar);
+
+        for (i = 0; i < 3; i++) {
+                for (k = 0; k < 3; k++)
+                        ttt_field_set_owner(view->field[i][k], TTT_OWNER_NONE);
+        }
+
+        gtk_header_bar_set_title(hbar, TTT_TITLE_TURN_ONE);
+        view->round = 0;
+}
+
+GtkWidget *ttt_view_get_viewport(TttView *view)
+{
+        return view->grid;
+}
+
+void ttt_view_set_header_bar(TttView *view,
+                             GtkWidget *hbar)
+{
+        view->hbar = hbar;
 }
 
 TttView *ttt_view_new(void)

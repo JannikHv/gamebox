@@ -20,6 +20,7 @@
 "        color:         transparent;"\
 "        border-color:  #000000;"\
 "        border-radius: 0%;"\
+"        box-shadow:    none;"\
 "}"\
 "button.ttt-field:active {"\
 "        background:   #FFFFFF;"\
@@ -34,26 +35,27 @@
 "        border-color:  #000000;"\
 "        border-radius: 100%;"\
 "        border-width:  2px;"\
+"        box-shadow:    none;"\
 "}"\
 "button.cf-field:active {"\
 "        background:   #E8E8E8;"\
 "        border-color: #000000;"\
 "}"\
-"button.cf-player1 {"\
+"button.cf-player-one {"\
 "        background: #FFFF00;"\
 "}"\
-"button.cf-player1:active {"\
+"button.cf-player-one:active {"\
 "        background: #FFFF00;"\
 "}"\
-"button.cf-player2 {"\
+"button.cf-player-two {"\
 "        background: #FF0000;"\
 "}"\
-"button.cf-player2:active {"\
+"button.cf-player-two:active {"\
 "        background: #FF0000;"\
 "}"\
 "grid.mill-grid {"\
 "        background: #3C434F;"\
-"        background-image: url(\"/usr/share/gamebox/images/mill.png\")"\
+"        background-image: url(\"/usr/share/gamebox/images/mill.png\");"\
 "}"\
 "button.mill-field {"\
 "        border-radius: 2px;"\
@@ -61,6 +63,7 @@
 "        border-color:  #000000;"\
 "        color:         transparent;"\
 "        background:    #A5A9AF;"\
+"        box-shadow:    none;"\
 "}"\
 "button.mill-player-one {"\
 "        background: #035A0B;"\
@@ -73,6 +76,34 @@
 "}"\
 "button.mill-player-two:hover {"\
 "        background: #CC0000;"\
+"}"\
+"grid.chks-grid {"\
+"        background-image: url(\"/usr/share/gamebox/images/checkers.png\");"\
+"}"\
+"button.chks-field {"\
+"        border-radius: 100%;"\
+"        border-width:  0px;"\
+"        border-color:  transparent;"\
+"        color:         transparent;"\
+"        background:    transparent;"\
+"        opacity:       0;"\
+"        box-shadow:    none;"\
+"}"\
+"button.chks-player-one {"\
+"        background: #FFFFFF;"\
+"        opacity:     1;"\
+"}"\
+"button.chks-player-two {"\
+"        background: #000000;"\
+"        opacity:    1;"\
+"}"\
+"button.chks-player-one-pre {"\
+"        background: #FFFFFF;"\
+"        opacity:    0.5;"\
+"}"\
+"button.chks-player-two-pre {"\
+"        background: #000000;"\
+"        opacity:    0.5;"\
 "}"
 
 #endif /* __CSS_CODE_H__ */

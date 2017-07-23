@@ -3,6 +3,7 @@
 #include "tictactoe/ttt-view.h"
 #include "connect-four/cf-view.h"
 #include "mill/mill-view.h"
+#include "checkers/chks-view.h"
 #include "css-code.h"
 
 #define GBOX_SIZE_WIN_X 670
@@ -17,17 +18,29 @@
 #define GBOX_SIZE_MILL_X 600
 #define GBOX_SIZE_MILL_Y 600
 
+#define GBOX_SIZE_CHKS_X 600
+#define GBOX_SIZE_CHKS_Y 600
+
 #define GBOX_TITLE_PREV_TTT  "Tic Tac Toe"
 #define GBOX_TITLE_PREV_CF   "Connect Four"
 #define GBOX_TITLE_PREV_MILL "Mill"
+#define GBOX_TITLE_PREV_CHKS "Checkers"
 
 #define GBOX_TITLE_GAME_TTT  "ttt"
 #define GBOX_TITLE_GAME_CF   "cf"
 #define GBOX_TITLE_GAME_MILL "mill"
+#define GBOX_TITLE_GAME_CHKS "chks"
 
 #define GBOX_TITLE_MAIN "GameBox"
 
 #define GBOX_CLASS_WINDOW "gbox-window"
+
+typedef enum {
+        GBOX_GAME_TTT,
+        GBOX_GAME_CF,
+        GBOX_GAME_MILL,
+        GBOX_GAME_CHKS,
+} GBoxGame;
 
 struct _GBoxWindow {
         /* Container */
@@ -47,11 +60,16 @@ struct _GBoxWindow {
         GBoxPreview *prev_ttt;
         GBoxPreview *prev_cf;
         GBoxPreview *prev_mill;
+        GBoxPreview *prev_chks;
 
         /* Views (Games) */
         TttView  *view_ttt;
         CfView   *view_cf;
         MillView *view_mill;
+        ChksView *view_chks;
+
+        /* States */
+        GBoxGame active_game;
 };
 
 static void load_style_context(void)
@@ -67,40 +85,70 @@ static void load_style_context(void)
                                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
+static GBoxGame get_active_game(GBoxWindow *win)
+{
+        GtkStack *stack_prev;
+        const gchar *title_prev;
+
+        stack_prev = GTK_STACK(win->stack_prev);
+        title_prev = gtk_stack_get_visible_child_name(stack_prev);
+
+        if (g_strcmp0(title_prev, GBOX_TITLE_PREV_TTT) == 0)
+                return GBOX_GAME_TTT;
+        else if (g_strcmp0(title_prev, GBOX_TITLE_PREV_CF) == 0)
+                return GBOX_GAME_CF;
+        else if (g_strcmp0(title_prev, GBOX_TITLE_PREV_MILL) == 0)
+                return GBOX_GAME_MILL;
+        else
+                return GBOX_GAME_CHKS;
+}
+
 static void start_game_button_clicked(GtkWidget *button,
                                       GBoxWindow *win)
 {
         GtkWidget *visible_child;
         GtkWindow *window;
-        GtkStack *stack_main, *stack_prev, *stack_game;
-        const gchar *title_prev, *title_game;
+        GtkStack *stack_main, *stack_game;
+        const gchar *title_game;
         gboolean resizable;
         gint size_x, size_y;
 
-        visible_child = win->stack_game;
-        window        = GTK_WINDOW(win->self);
-        stack_main    = GTK_STACK(win->stack_main);
-        stack_prev    = GTK_STACK(win->stack_prev);
-        stack_game    = GTK_STACK(win->stack_game);
-        title_prev    = gtk_stack_get_visible_child_name(stack_prev);
-        resizable     = TRUE;
+        visible_child    = win->stack_game;
+        window           = GTK_WINDOW(win->self);
+        stack_main       = GTK_STACK(win->stack_main);
+        stack_game       = GTK_STACK(win->stack_game);
+        resizable        = TRUE;
 
-        if (g_strcmp0(title_prev, GBOX_TITLE_PREV_TTT) == 0) {
+        /* Change the active game */
+        win->active_game = get_active_game(win);
+
+        switch (win->active_game) {
+        case GBOX_GAME_TTT:
                 ttt_view_reset(win->view_ttt);
                 title_game = GBOX_TITLE_GAME_TTT;
                 size_x = GBOX_SIZE_TTT_X;
                 size_y = GBOX_SIZE_TTT_Y;
-        } else if (g_strcmp0(title_prev, GBOX_TITLE_PREV_CF) == 0) {
+                break;
+        case GBOX_GAME_CF:
                 cf_view_reset(win->view_cf);
                 title_game = GBOX_TITLE_GAME_CF;
                 size_x = GBOX_SIZE_CF_X;
                 size_y = GBOX_SIZE_CF_Y;
-        } else if (g_strcmp0(title_prev, GBOX_TITLE_PREV_MILL) == 0) {
+                break;
+        case GBOX_GAME_MILL:
                 mill_view_reset(win->view_mill);
                 title_game = GBOX_TITLE_GAME_MILL;
                 resizable = FALSE;
                 size_x = GBOX_SIZE_MILL_X;
                 size_y = GBOX_SIZE_MILL_Y;
+                break;
+        case GBOX_GAME_CHKS:
+                chks_view_reset(win->view_chks);
+                title_game = GBOX_TITLE_GAME_CHKS;
+                resizable = FALSE;
+                size_x = GBOX_SIZE_CHKS_X;
+                size_y = GBOX_SIZE_CHKS_Y;
+                break;
         }
 
         /* Hide preview stack in order to resize the window properly */
@@ -122,19 +170,21 @@ static void start_game_button_clicked(GtkWidget *button,
 static void new_game_button_clicked(GtkWidget *button,
                                     GBoxWindow *win)
 {
-        GtkStack *stack_game;
-        const gchar *visible_name;
-
-        stack_game   = GTK_STACK(win->stack_game);
-        visible_name = gtk_stack_get_visible_child_name(stack_game);
-
         /* Reset game */
-        if (g_strcmp0(visible_name, GBOX_TITLE_GAME_TTT) == 0)
+        switch (win->active_game) {
+        case GBOX_GAME_TTT:
                 ttt_view_reset(win->view_ttt);
-        else if (g_strcmp0(visible_name, GBOX_TITLE_GAME_CF) == 0)
+                break;
+        case GBOX_GAME_CF:
                 cf_view_reset(win->view_cf);
-        else if (g_strcmp0(visible_name, GBOX_TITLE_GAME_MILL) == 0)
+                break;
+        case GBOX_GAME_MILL:
                 mill_view_reset(win->view_mill);
+                break;
+        case GBOX_GAME_CHKS:
+                chks_view_reset(win->view_chks);
+                break;
+        }
 }
 
 static void back_button_clicked(GtkWidget *button,
@@ -142,30 +192,16 @@ static void back_button_clicked(GtkWidget *button,
 {
         GtkWindow *window;
         GtkHeaderBar *hbar;
-        GtkWidget *visible_child;
-        GtkStack *stack_main, *stack_game;
-        const gchar *visible_name;
+        GtkStack *stack_main;
         gboolean resizable;
 
         window        = GTK_WINDOW(win->self);
         hbar          = GTK_HEADER_BAR(win->hbar);
-        visible_child = win->stack_prev;
         stack_main    = GTK_STACK(win->stack_main);
-        stack_game    = GTK_STACK(win->stack_game);
-        visible_name  = gtk_stack_get_visible_child_name(stack_game);
         resizable     = gtk_window_get_resizable(window);
 
-        /* Reset game */
-        if (g_strcmp0(visible_name, GBOX_TITLE_GAME_TTT) == 0)
-                ttt_view_reset(win->view_ttt);
-        else if (g_strcmp0(visible_name, GBOX_TITLE_GAME_CF) == 0)
-                cf_view_reset(win->view_cf);
-        else if (g_strcmp0(visible_name, GBOX_TITLE_GAME_MILL) == 0)
-                mill_view_reset(win->view_mill);
-
-        ttt_view_reset(win->view_ttt);
-        cf_view_reset(win->view_cf);
-        mill_view_reset(win->view_mill);
+        /* Reset the current game by pretending the new game button was clicked */
+        new_game_button_clicked(NULL, win);
 
         /* Show preview stack again */
         gtk_widget_show(win->stack_prev);
@@ -194,43 +230,49 @@ static void gbox_window_add_interface(GBoxWindow *win)
         stack_prev = GTK_STACK(win->stack_prev);
         stack_game = GTK_STACK(win->stack_game);
 
-        const gchar *title_prev[3] = {
+        const gchar *title_prev[4] = {
                 GBOX_TITLE_PREV_TTT,
                 GBOX_TITLE_PREV_CF,
                 GBOX_TITLE_PREV_MILL,
+                GBOX_TITLE_PREV_CHKS,
         };
 
-        const gchar *title_game[3] = {
+        const gchar *title_game[4] = {
                 GBOX_TITLE_GAME_TTT,
                 GBOX_TITLE_GAME_CF,
                 GBOX_TITLE_GAME_MILL,
+                GBOX_TITLE_GAME_CHKS,
         };
 
-        const gchar *image_name[3] = {
+        const gchar *image_name[4] = {
                 "tictactoe-preview.png",
                 "connect-four-preview.png",
                 "mill-preview.png",
+                "checkers-preview.png",
         };
 
-        GtkWidget *view_prev[3] = {
+        GtkWidget *view_prev[4] = {
                 gbox_preview_get_viewport(win->prev_ttt),
                 gbox_preview_get_viewport(win->prev_cf),
                 gbox_preview_get_viewport(win->prev_mill),
+                gbox_preview_get_viewport(win->prev_chks),
         };
 
-        GtkWidget *view_game[3] = {
+        GtkWidget *view_game[4] = {
                 ttt_view_get_viewport(win->view_ttt),
                 cf_view_get_viewport(win->view_cf),
                 mill_view_get_viewport(win->view_mill),
+                chks_view_get_viewport(win->view_chks),
         };
 
-        GBoxPreview *preview[3] = {
+        GBoxPreview *preview[4] = {
                 win->prev_ttt,
                 win->prev_cf,
                 win->prev_mill,
+                win->prev_chks,
         };
 
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < 4; i++) {
                 gtk_stack_add_titled(stack_prev, view_prev[i], title_prev[i], title_prev[i]);
                 gtk_stack_add_titled(stack_game, view_game[i], title_game[i], title_game[i]);
 
@@ -245,6 +287,7 @@ static void gbox_window_add_interface(GBoxWindow *win)
         ttt_view_set_header_bar(win->view_ttt, win->hbar);
         cf_view_set_header_bar(win->view_cf, win->hbar);
         mill_view_set_header_bar(win->view_mill, win->hbar);
+        chks_view_set_header_bar(win->view_chks, win->hbar);
 }
 
 static void gbox_window_init(GBoxWindow *win)
@@ -263,10 +306,12 @@ static void gbox_window_init(GBoxWindow *win)
         win->prev_ttt  = gbox_preview_new();
         win->prev_cf   = gbox_preview_new();
         win->prev_mill = gbox_preview_new();
+        win->prev_chks = gbox_preview_new();
 
         win->view_ttt  = ttt_view_new();
         win->view_cf   = cf_view_new();
         win->view_mill = mill_view_new();
+        win->view_chks = chks_view_new();
 
         /* Window */
         gtk_style_context_add_class(gtk_widget_get_style_context(win->self), GBOX_CLASS_WINDOW);

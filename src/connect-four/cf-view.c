@@ -112,42 +112,6 @@ static void cf_field_clicked(GtkWidget *button,
         view->round++;
 }
 
-/**
- * Accessors
- */
-void cf_view_reset(CfView *view)
-{
-        GtkHeaderBar *hbar;
-        GtkWidget *widget, *label;
-        gint i, k;
-
-        view->running = TRUE;
-        hbar = GTK_HEADER_BAR(view->hbar);
-
-        for (i = 0; i < 7; i++) {
-                for (k = 0; k < 6; k++) {
-                        widget = cf_field_get_button(view->field[i][k]);
-                        label  = gtk_bin_get_child(GTK_BIN(widget));
-                        cf_field_set_owner(view->field[i][k], CF_OWNER_NONE);
-                        gtk_label_set_markup(GTK_LABEL(label), "");
-                }
-        }
-
-        gtk_header_bar_set_title(hbar, CF_TITLE_TURN_ONE);
-        view->round = 0;
-}
-
-GtkWidget *cf_view_get_viewport(CfView *view)
-{
-        return view->grid;
-}
-
-void cf_view_set_header_bar(CfView *view,
-                            GtkWidget *hbar)
-{
-        view->hbar = hbar;
-}
-
 static void cf_view_add_fields(CfView *view,
                                CfField *field[7][6])
 {
@@ -183,6 +147,42 @@ static void cf_view_init(CfView *view)
         gtk_grid_set_column_homogeneous(GTK_GRID(view->grid), TRUE);
         gtk_grid_set_row_homogeneous(GTK_GRID(view->grid), TRUE);
         cf_view_add_fields(view, view->field);
+}
+
+/**
+ * Accessors
+ */
+void cf_view_reset(CfView *view)
+{
+        GtkHeaderBar *hbar;
+        GtkWidget *widget, *label;
+        gint i, k;
+
+        view->running = TRUE;
+        hbar = GTK_HEADER_BAR(view->hbar);
+
+        for (i = 0; i < 7; i++) {
+                for (k = 0; k < 6; k++) {
+                        widget = cf_field_get_button(view->field[i][k]);
+                        label  = gtk_bin_get_child(GTK_BIN(widget));
+                        cf_field_set_owner(view->field[i][k], CF_OWNER_NONE);
+                        gtk_label_set_markup(GTK_LABEL(label), "");
+                }
+        }
+
+        gtk_header_bar_set_title(hbar, CF_TITLE_TURN_ONE);
+        view->round = 0;
+}
+
+GtkWidget *cf_view_get_viewport(CfView *view)
+{
+        return view->grid;
+}
+
+void cf_view_set_header_bar(CfView *view,
+                            GtkWidget *hbar)
+{
+        view->hbar = hbar;
 }
 
 CfView *cf_view_new(void)
