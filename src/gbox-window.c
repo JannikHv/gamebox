@@ -159,7 +159,7 @@ static void start_game_button_clicked(GtkWidget *button,
         gtk_stack_set_visible_child(stack_main, visible_child);
         gtk_window_set_default_size(window, size_x, size_y);
         gtk_window_resize(window, size_x, size_y);
-        gdk_flush();
+        gdk_display_flush(gdk_display_get_default());
         gtk_window_set_resizable(window, resizable);
 
         /* Make header bar buttons sensitive */
