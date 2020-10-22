@@ -56,7 +56,7 @@
 "}"\
 "grid.mill-grid {"\
 "        background: #3C434F;"\
-"        background-image: url(\""IMAGES_PATH_DEFAULT"\");"\
+"        background-image: url(\""IMAGES_PATH_DEFAULT"mill.png\");"\
 "}"\
 "button.mill-field {"\
 "        border-radius: 2px;"\
@@ -79,7 +79,7 @@
 "        background: #CC0000;"\
 "}"\
 "grid.chks-grid {"\
-"        background-image: url(\""IMAGES_PATH_DEFAULT"\");"\
+"        background-image: url(\""IMAGES_PATH_DEFAULT"checkers.png\");"\
 "}"\
 "button.chks-field {"\
 "        border-radius: 100%;"\
