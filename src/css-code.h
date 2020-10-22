@@ -1,3 +1,4 @@
+#include "CONFIG.h"
 #ifndef __CSS_CODE_H__
 #define __CSS_CODE_H__
 
@@ -55,7 +56,7 @@
 "}"\
 "grid.mill-grid {"\
 "        background: #3C434F;"\
-"        background-image: url(\"/usr/share/gamebox/images/mill.png\");"\
+"        background-image: url(\""IMAGES_PATH_DEFAULT"\");"\
 "}"\
 "button.mill-field {"\
 "        border-radius: 2px;"\
@@ -78,7 +79,7 @@
 "        background: #CC0000;"\
 "}"\
 "grid.chks-grid {"\
-"        background-image: url(\"/usr/share/gamebox/images/checkers.png\");"\
+"        background-image: url(\""IMAGES_PATH_DEFAULT"\");"\
 "}"\
 "button.chks-field {"\
 "        border-radius: 100%;"\

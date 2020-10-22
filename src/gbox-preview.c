@@ -1,4 +1,5 @@
 #include "gbox-preview.h"
+#include "CONFIG.h"
 
 #include <gtk/gtk.h>
 #include <string.h>
@@ -38,7 +39,7 @@ static const gchar *get_image_path_from_name(const gchar *name)
         gint length;
         gchar *path;
 
-        static const gchar *path_default = "/usr/share/gamebox/images/";
+        static const gchar *path_default = IMAGES_PATH_DEFAULT;
 
         static gint path_default_length = 26;
 
