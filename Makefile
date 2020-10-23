@@ -25,6 +25,9 @@ SRCS = src/tictactoe/ttt-view.c    \
 all: $(SRCS)
 	$(CC) $(FLAGS) $(SRCS) $(LIBS) -o $(NAME)
 
+debug:
+	$(CC) -DDEBUG $(FLAGS) $(SRCS) $(LIBS) -o $(NAME)
+
 clean: $(NAME)
 	rm $(NAME)
 
